@@ -167,9 +167,17 @@ function updatePotatoImage() {
     // Remove all special classes
     potatoImage.className = '';
     
-    // Reset the potato container background
-    potatoContainer.style.backgroundImage = 'none';
+    // Check if sky background should be visible
+    if (gameState.upgrades.goldenPotato.owned) {
+        // Always apply sky background if it's been unlocked
+        potatoContainer.style.backgroundImage = `url(${gameState.upgrades.goldenPotato.imageUrl})`;
+        potatoContainer.classList.add('sky-background');
+    } else {
+        // Reset the potato container background if not unlocked
+        potatoContainer.style.backgroundImage = 'none';
+    }
     
+    // Apply highest owned potato image
     if (gameState.upgrades.quantumPotato.owned) {
         // Quantum potato
         potatoImage.src = gameState.upgrades.quantumPotato.imageUrl;
@@ -184,11 +192,6 @@ function updatePotatoImage() {
     } else if (gameState.upgrades.rainbowPotato.owned) {
         // Poketato
         potatoImage.src = gameState.upgrades.rainbowPotato.imageUrl;
-    } else if (gameState.upgrades.goldenPotato.owned) {
-        // Sky potato - apply the sky background
-        potatoImage.src = gameState.basePotatoImage;
-        potatoContainer.style.backgroundImage = `url(${gameState.upgrades.goldenPotato.imageUrl})`;
-        potatoContainer.classList.add('sky-background');
     } else {
         // Base potato
         potatoImage.src = gameState.basePotatoImage;
