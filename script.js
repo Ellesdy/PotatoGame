@@ -14,25 +14,25 @@ let gameState = {
             owned: false,
             cost: 500,
             multiplier: 5,
-            imageUrl: 'https://cdn.discordapp.com/attachments/1352514757097427037/1368493624035250277/AJfQ9KTMeUOIPKBZyZrj8WnAe-5QjpTz2sWsS_O7owyvnLZ41NliPp4PGiveyfjaHFP-0wtCOrhejo-ygIeRPNVWkTQorJW9ZolAxueeYUEojyqZgbMsvJG8-sayD9eYPx4_8FOfuRlRkPbWr9Ci6ElsnfSV2UnKMrHH2P0sa8FIuoa0LNjaJQ.png'
+            imageUrl: 'assets/poketato.png'
         },
         spacePotato: {
             owned: false,
             cost: 2500,
             multiplier: 25,
-            imageUrl: 'https://cdn.discordapp.com/attachments/1352514757097427037/1368493865920892969/AJfQ9KRw5D7I1UG4PQXq9H5j8PTSPvh-or3Aay8Kw6JlsguXvE2im7RybxCuG5a3_j4dfcOtdvQ6RbcgmuP-07PMwUdhHfmwbb1CX-AnDgP9CC_PX8qxJC5jhHsB8tPfdPK0pvP8uvncUiR2LoM3hJExRJ-5SZ8bfbD9ff9OLbR2ENA4UEV13w.png'
+            imageUrl: 'assets/megatato.png'
         },
         robotPotato: {
             owned: false,
             cost: 10000,
             multiplier: 100,
-            imageUrl: 'https://cdn.discordapp.com/attachments/1352514757097427037/1368494183249346593/AJfQ9KQeAPi-olyEOgS5Uhuv8POCkDvqEmYIKT-0Hksb4AEhNk_A9_vH5boHm3GQbifLxWxh7mucLPlIpcFqMkz2NFYSaf0b9FqT4e4vz6_LI1inT65bFh_6uS7RwwuT7FVEyF-kbfX2hbdcppw_kSxdXjleRiZOmwBaT2RlU0qP2oCopcZTAQ.png'
+            imageUrl: 'assets/powertato.png'
         },
         quantumPotato: {
             owned: false,
             cost: 50000,
             multiplier: 500,
-            imageUrl: 'https://cdn.discordapp.com/attachments/1352514757097427037/1368502196043513917/AJfQ9KRXJjiYchDT452FIS5a6y5ALg4-83nFIYtfKxDdThnA0Oxs2i1mcPZT01kKP8o7ihVKWaDXLOQCyqGcS2ihU7ri33V5YGLlARP2q3UOxHejpqWmJ-LIUfAUOTThbUX_qsmirOjtABAEvbHRjpfcTC3ZkXsFrscspoCjOKXRTcHRJvKJ5ws1024.png?ex=6818747d&is=681722fd&hm=a88aa25f11bb573121732b8929fa82f10f828fd9196758c5580f4814a42ee0db&'
+            imageUrl: 'assets/quantumpotatoe.png'
         }
     },
     basePotatoImage: 'https://cdn.discordapp.com/attachments/1352514757097427037/1368492928607064064/image.png?ex=68186bdb&is=68171a5b&hm=958d4e783b5d3b33767d683934714a24f05e5e2608f5cce44229668a98388094&'
