@@ -32,7 +32,7 @@ let gameState = {
             owned: false,
             cost: 50000,
             multiplier: 500,
-            imageUrl: 'https://cdn-icons-png.flaticon.com/512/9795/9795328.png'
+            imageUrl: 'https://cdn.discordapp.com/attachments/1352514757097427037/1368502196043513917/AJfQ9KRXJjiYchDT452FIS5a6y5ALg4-83nFIYtfKxDdThnA0Oxs2i1mcPZT01kKP8o7ihVKWaDXLOQCyqGcS2ihU7ri33V5YGLlARP2q3UOxHejpqWmJ-LIUfAUOTThbUX_qsmirOjtABAEvbHRjpfcTC3ZkXsFrscspoCjOKXRTcHRJvKJ5ws1024.png?ex=6818747d&is=681722fd&hm=a88aa25f11bb573121732b8929fa82f10f828fd9196758c5580f4814a42ee0db&'
         }
     },
     basePotatoImage: 'https://cdn.discordapp.com/attachments/1352514757097427037/1368492928607064064/image.png?ex=68186bdb&is=68171a5b&hm=958d4e783b5d3b33767d683934714a24f05e5e2608f5cce44229668a98388094&'
