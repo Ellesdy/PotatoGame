@@ -3,25 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Potato Clicker</title>
+    <title>Potato Clicker v2.0</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="game-container">
         <div class="header">
-            <h1>Potato Clicker</h1>
+            <h1>Potato Clicker <span class="version-tag">v2.0</span></h1>
             <button id="dark-mode-toggle" class="mode-toggle">
                 <i class="fas fa-moon"></i>
             </button>
+        </div>
+        
+        <div id="famine-alert" class="famine-alert hidden">
+            <i class="fas fa-skull-crossbones"></i>
+            <span>POTATO FAMINE!</span>
+            <p class="famine-description">A terrible potato blight has struck! All farms are producing 75% less until the crisis ends.</p>
+            <div class="famine-timer">Ends in: <span id="famine-time">30</span>s</div>
         </div>
         
         <div class="stats">
             <div class="potatoes">
                 <span id="potato-count">0</span> Potatoes
             </div>
-            <div class="potatoes-per-click">
-                <span id="potatoes-per-click">1</span> Potatoes per click
+            <div class="stats-row">
+                <div class="potatoes-per-click">
+                    <i class="fas fa-hand-pointer"></i> <span id="potatoes-per-click">1</span> per click
+                </div>
+                <div class="potatoes-per-second">
+                    <i class="fas fa-tractor"></i> <span id="potatoes-per-second">0</span> per second
+                </div>
             </div>
         </div>
         
@@ -29,53 +41,118 @@
             <img id="potato" src="https://cdn.discordapp.com/attachments/1352514757097427037/1368492928607064064/image.png?ex=68186bdb&is=68171a5b&hm=958d4e783b5d3b33767d683934714a24f05e5e2608f5cce44229668a98388094&" alt="Potato">
         </div>
         
-        <div class="upgrades">
-            <h2>Upgrades</h2>
-            <div class="upgrade" id="goldenPotato">
-                <img src="https://media.discordapp.net/attachments/1352514757097427037/1368493066289414185/image.png?ex=68186bfc&is=68171a7c&hm=11055cb4dda1b6d24cf1983fe9b7b60b00a0ebfc63e2ca167e0ffa9744b1a8d5" alt="Sky Potato" class="upgrade-img">
-                <div>
-                    <h3>Sky Potato</h3>
-                    <p>2x potatoes per click</p>
-                    <p>Cost: <span id="golden-potato-cost">100</span> potatoes</p>
-                </div>
-                <button id="buy-golden-potato">Buy</button>
+        <div class="game-sections">
+            <div class="section-tabs">
+                <button class="tab-button active" data-tab="upgrades-tab">Upgrades</button>
+                <button class="tab-button" data-tab="farms-tab">Farms</button>
             </div>
-            <div class="upgrade" id="rainbowPotato">
-                <img src="assets/poketato.png" alt="Poketato">
-                <div>
-                    <h3>Poketato</h3>
-                    <p>5x potatoes per click</p>
-                    <p>Cost: <span id="rainbow-potato-cost">500</span> potatoes</p>
+            
+            <div class="tab-content active" id="upgrades-tab">
+                <h2>Potato Upgrades</h2>
+                <div class="upgrades">
+                    <div class="upgrade" id="goldenPotato">
+                        <img src="https://media.discordapp.net/attachments/1352514757097427037/1368493066289414185/image.png?ex=68186bfc&is=68171a7c&hm=11055cb4dda1b6d24cf1983fe9b7b60b00a0ebfc63e2ca167e0ffa9744b1a8d5" alt="Sky Potato" class="upgrade-img">
+                        <div>
+                            <h3>Sky Potato</h3>
+                            <p>2x potatoes per click</p>
+                            <p>Cost: <span id="golden-potato-cost">100</span> potatoes</p>
+                        </div>
+                        <button id="buy-golden-potato">Buy</button>
+                    </div>
+                    <div class="upgrade" id="rainbowPotato">
+                        <img src="assets/poketato.png" alt="Poketato">
+                        <div>
+                            <h3>Poketato</h3>
+                            <p>5x potatoes per click</p>
+                            <p>Cost: <span id="rainbow-potato-cost">500</span> potatoes</p>
+                        </div>
+                        <button id="buy-rainbow-potato">Buy</button>
+                    </div>
+                    <div class="upgrade" id="spacePotato">
+                        <img src="assets/megatato.png" alt="Megatato">
+                        <div>
+                            <h3>Megatato</h3>
+                            <p>25x potatoes per click</p>
+                            <p>Cost: <span id="space-potato-cost">2500</span> potatoes</p>
+                        </div>
+                        <button id="buy-space-potato">Buy</button>
+                    </div>
+                    <div class="upgrade" id="robotPotato">
+                        <img src="assets/powertato.png" alt="Powertato">
+                        <div>
+                            <h3>Powertato</h3>
+                            <p>100x potatoes per click</p>
+                            <p>Cost: <span id="robot-potato-cost">10000</span> potatoes</p>
+                        </div>
+                        <button id="buy-robot-potato">Buy</button>
+                    </div>
+                    <div class="upgrade" id="quantumPotato">
+                        <img src="assets/quantumpotatoe.png" alt="Quantum Potato">
+                        <div>
+                            <h3>Quantum Potato</h3>
+                            <p>500x potatoes per click</p>
+                            <p>Cost: <span id="quantum-potato-cost">50000</span> potatoes</p>
+                        </div>
+                        <button id="buy-quantum-potato">Buy</button>
+                    </div>
                 </div>
-                <button id="buy-rainbow-potato">Buy</button>
             </div>
-            <div class="upgrade" id="spacePotato">
-                <img src="assets/megatato.png" alt="Megatato">
-                <div>
-                    <h3>Megatato</h3>
-                    <p>25x potatoes per click</p>
-                    <p>Cost: <span id="space-potato-cost">2500</span> potatoes</p>
+            
+            <div class="tab-content" id="farms-tab">
+                <h2>Potato Farms</h2>
+                <div class="farms">
+                    <div class="farm" id="smallPlot">
+                        <img src="https://cdn-icons-png.flaticon.com/512/1691/1691243.png" alt="Small Plot">
+                        <div>
+                            <h3>Small Plot <span class="farm-count" id="small-plot-count">0</span></h3>
+                            <p>1 potato per second</p>
+                            <p>Cost: <span id="small-plot-cost">50</span> potatoes</p>
+                        </div>
+                        <button id="buy-small-plot">Buy</button>
+                    </div>
+                    <div class="farm" id="potatoField">
+                        <img src="https://cdn-icons-png.flaticon.com/512/2684/2684631.png" alt="Potato Field">
+                        <div>
+                            <h3>Potato Field <span class="farm-count" id="potato-field-count">0</span></h3>
+                            <p>5 potatoes per second</p>
+                            <p>Cost: <span id="potato-field-cost">250</span> potatoes</p>
+                        </div>
+                        <button id="buy-potato-field">Buy</button>
+                    </div>
+                    <div class="farm" id="potatoGreenhouse">
+                        <img src="https://cdn-icons-png.flaticon.com/512/4997/4997436.png" alt="Potato Greenhouse">
+                        <div>
+                            <h3>Potato Greenhouse <span class="farm-count" id="potato-greenhouse-count">0</span></h3>
+                            <p>20 potatoes per second</p>
+                            <p>Cost: <span id="potato-greenhouse-cost">1000</span> potatoes</p>
+                        </div>
+                        <button id="buy-potato-greenhouse">Buy</button>
+                    </div>
+                    <div class="farm" id="potatoFactory">
+                        <img src="https://cdn-icons-png.flaticon.com/512/3460/3460335.png" alt="Potato Factory">
+                        <div>
+                            <h3>Potato Factory <span class="farm-count" id="potato-factory-count">0</span></h3>
+                            <p>100 potatoes per second</p>
+                            <p>Cost: <span id="potato-factory-cost">5000</span> potatoes</p>
+                        </div>
+                        <button id="buy-potato-factory">Buy</button>
+                    </div>
+                    <div class="farm" id="potatoLab">
+                        <img src="https://cdn-icons-png.flaticon.com/512/7161/7161491.png" alt="Potato Lab">
+                        <div>
+                            <h3>Potato Lab <span class="farm-count" id="potato-lab-count">0</span></h3>
+                            <p>500 potatoes per second</p>
+                            <p>Cost: <span id="potato-lab-cost">25000</span> potatoes</p>
+                        </div>
+                        <button id="buy-potato-lab">Buy</button>
+                    </div>
                 </div>
-                <button id="buy-space-potato">Buy</button>
             </div>
-            <div class="upgrade" id="robotPotato">
-                <img src="assets/powertato.png" alt="Powertato">
-                <div>
-                    <h3>Powertato</h3>
-                    <p>100x potatoes per click</p>
-                    <p>Cost: <span id="robot-potato-cost">10000</span> potatoes</p>
-                </div>
-                <button id="buy-robot-potato">Buy</button>
-            </div>
-            <div class="upgrade" id="quantumPotato">
-                <img src="assets/quantumpotatoe.png" alt="Quantum Potato">
-                <div>
-                    <h3>Quantum Potato</h3>
-                    <p>500x potatoes per click</p>
-                    <p>Cost: <span id="quantum-potato-cost">50000</span> potatoes</p>
-                </div>
-                <button id="buy-quantum-potato">Buy</button>
-            </div>
+        </div>
+        
+        <div class="credits">
+            <p>A <span class="credit-highlight">Mirage★Net</span> collaboration</p>
+            <p class="version">Version 2.0 | Now with automated potato farms and events!</p>
         </div>
     </div>
     <script src="script.js"></script>

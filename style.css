@@ -19,6 +19,10 @@
     --disabled-color: #cccccc;
     --shadow-color: rgba(0, 0, 0, 0.1);
     --gold-color: gold;
+    --danger-color: #d9534f;
+    --danger-text: #fff;
+    --tab-inactive: #e0e0e0;
+    --tab-active-border: #8B4513;
 }
 
 .dark-mode {
@@ -34,6 +38,10 @@
     --disabled-color: #555555;
     --shadow-color: rgba(0, 0, 0, 0.3);
     --gold-color: #ffd700;
+    --danger-color: #e57373;
+    --danger-text: #121212;
+    --tab-inactive: #333333;
+    --tab-active-border: #ffb74d;
 }
 
 body {
@@ -73,9 +81,19 @@ h1 {
     margin: 0;
 }
 
+.version-tag {
+    font-size: 1rem;
+    vertical-align: super;
+    color: var(--primary-color);
+    opacity: 0.8;
+    margin-left: 5px;
+}
+
 h2 {
     color: var(--primary-color);
     margin: 15px 0;
+    font-size: 1.8rem;
+    text-align: center;
 }
 
 h3 {
@@ -104,13 +122,27 @@ h3 {
 
 .stats {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
     margin-bottom: 20px;
     font-size: 1.2rem;
     background-color: var(--secondary-bg);
     padding: 15px;
     border-radius: 8px;
     color: var(--text-color);
+}
+
+.stats-row {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+
+.potatoes {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--primary-color);
+    text-align: center;
+    margin-bottom: 10px;
 }
 
 .potato-container {
@@ -152,6 +184,50 @@ h3 {
     transform: scale(0.95);
 }
 
+/* Tabs */
+.game-sections {
+    margin-bottom: 20px;
+}
+
+.section-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 15px;
+}
+
+.tab-button {
+    padding: 10px 20px;
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    cursor: pointer;
+    font-size: 1rem;
+    color: var(--text-color);
+    opacity: 0.7;
+    transition: opacity 0.3s, border-color 0.3s;
+    flex: 1;
+    text-align: center;
+}
+
+.tab-button:hover {
+    opacity: 1;
+}
+
+.tab-button.active {
+    opacity: 1;
+    border-bottom-color: var(--tab-active-border);
+    font-weight: bold;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* Upgrades */
 .upgrades {
     background-color: var(--secondary-bg);
     padding: 15px;
@@ -174,14 +250,14 @@ h3 {
     box-shadow: 0 4px 8px var(--shadow-color);
 }
 
-.upgrade img {
+.upgrade img, .farm img {
     width: 50px;
     height: 50px;
     margin-right: 15px;
     object-fit: contain;
 }
 
-.upgrade button {
+.upgrade button, .farm button {
     margin-left: auto;
     padding: 8px 15px;
     background-color: var(--button-color);
@@ -193,15 +269,15 @@ h3 {
     font-weight: bold;
 }
 
-.upgrade button:hover {
+.upgrade button:hover, .farm button:hover {
     background-color: var(--button-hover);
 }
 
-.upgrade button:active {
+.upgrade button:active, .farm button:active {
     transform: scale(0.95);
 }
 
-.upgrade button:disabled {
+.upgrade button:disabled, .farm button:disabled {
     background-color: var(--disabled-color);
     cursor: not-allowed;
 }
@@ -222,6 +298,81 @@ h3 {
     color: var(--primary-color);
 }
 
+/* Farms */
+.farms {
+    background-color: var(--secondary-bg);
+    padding: 15px;
+    border-radius: 8px;
+}
+
+.farm {
+    display: flex;
+    align-items: center;
+    margin: 15px 0;
+    padding: 10px;
+    background-color: var(--container-bg);
+    border-radius: 8px;
+    box-shadow: 0 2px 5px var(--shadow-color);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.farm:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px var(--shadow-color);
+}
+
+.farm-count {
+    display: inline-block;
+    background-color: var(--primary-color);
+    color: var(--button-text);
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 0.8rem;
+    margin-left: 5px;
+}
+
+/* Famine Event */
+.famine-alert {
+    background-color: var(--danger-color);
+    color: var(--danger-text);
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    box-shadow: 0 0 15px rgba(255, 0, 0, 0.3);
+    position: relative;
+}
+
+.famine-alert i {
+    font-size: 24px;
+    margin-bottom: 5px;
+}
+
+.famine-alert span {
+    font-size: 1.3rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.famine-description {
+    margin-bottom: 10px;
+    font-size: 0.9rem;
+}
+
+.famine-timer {
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.hidden {
+    display: none;
+}
+
+/* Animations */
 @keyframes pop {
     0% { transform: scale(1); }
     50% { transform: scale(1.2); }
@@ -250,6 +401,18 @@ h3 {
     animation: glowing 1.5s infinite alternate;
 }
 
+@keyframes shake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    50% { transform: translateX(5px); }
+    75% { transform: translateX(-5px); }
+    100% { transform: translateX(0); }
+}
+
+.shake {
+    animation: shake 0.5s;
+}
+
 .upgrade-effect {
     position: fixed;
     top: 0;
@@ -273,22 +436,48 @@ h3 {
     animation: pop 0.5s infinite alternate;
 }
 
+.credits {
+    margin-top: 30px;
+    padding-top: 15px;
+    border-top: 1px solid var(--border-color);
+    text-align: center;
+    font-size: 0.9rem;
+    color: var(--text-color);
+    opacity: 0.8;
+}
+
+.credit-highlight {
+    font-weight: bold;
+    color: var(--primary-color);
+    font-size: 1.1rem;
+}
+
+.version {
+    margin-top: 5px;
+    font-size: 0.8rem;
+}
+
+.coming-soon {
+    font-style: italic;
+    color: var(--primary-color);
+}
+
 @media (max-width: 500px) {
     .stats {
         flex-direction: column;
     }
     
-    .upgrade {
+    .upgrade, .farm {
         flex-direction: column;
         text-align: center;
     }
     
-    .upgrade img {
+    .upgrade img, .farm img {
         margin-right: 0;
         margin-bottom: 10px;
     }
     
-    .upgrade button {
+    .upgrade button, .farm button {
         margin-left: 0;
         margin-top: 10px;
     }
