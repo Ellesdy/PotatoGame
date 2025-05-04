@@ -2,7 +2,7 @@
 let gameState = {
     potatoes: 0,
     potatoesPerClick: 1,
-    darkMode: false,
+    darkMode: true,
     upgrades: {
         goldenPotato: {
             owned: false,
@@ -295,5 +295,16 @@ document.getElementById('dark-mode-toggle')?.addEventListener('click', toggleDar
 setInterval(saveGame, 30000);
 
 // Initialize the game
-loadGame();
-updateDisplay(); 
+function initGame() {
+    loadGame();
+    
+    // Apply dark mode by default if no saved state exists
+    if (!localStorage.getItem('potatoClickerSave')) {
+        document.body.classList.add('dark-mode');
+    }
+    
+    updateDisplay();
+}
+
+// Initialize the game
+initGame(); 
