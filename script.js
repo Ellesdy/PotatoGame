@@ -14,19 +14,19 @@ let gameState = {
             owned: false,
             cost: 500,
             multiplier: 5,
-            imageUrl: 'https://cdn-icons-png.flaticon.com/512/3769/3769733.png'
+            imageUrl: 'https://cdn.discordapp.com/attachments/1352514757097427037/1368493624035250277/AJfQ9KTMeUOIPKBZyZrj8WnAe-5QjpTz2sWsS_O7owyvnLZ41NliPp4PGiveyfjaHFP-0wtCOrhejo-ygIeRPNVWkTQorJW9ZolAxueeYUEojyqZgbMsvJG8-sayD9eYPx4_8FOfuRlRkPbWr9Ci6ElsnfSV2UnKMrHH2P0sa8FIuoa0LNjaJQ.png?ex=68186c81&is=68171b01&hm=3098f6c799c76561f57f3a92a96e6f88de3aa856fabf5336dbc1f3cc585aae1b&'
         },
         spacePotato: {
             owned: false,
             cost: 2500,
             multiplier: 25,
-            imageUrl: 'https://cdn-icons-png.flaticon.com/512/7695/7695574.png'
+            imageUrl: 'https://cdn.discordapp.com/attachments/1352514757097427037/1368493865920892969/AJfQ9KRw5D7I1UG4PQXq9H5j8PTSPvh-or3Aay8Kw6JlsguXvE2im7RybxCuG5a3_j4dfcOtdvQ6RbcgmuP-07PMwUdhHfmwbb1CX-AnDgP9CC_PX8qxJC5jhHsB8tPfdPK0pvP8uvncUiR2LoM3hJExRJ-5SZ8bfbD9ff9OLbR2ENA4UEV13w.png?ex=68186cbb&is=68171b3b&hm=0e95d2d61faa5ab58abc9e27d321f091db587aed72c5515a02ddb4545ac86f0f&'
         },
         robotPotato: {
             owned: false,
             cost: 10000,
             multiplier: 100,
-            imageUrl: 'https://cdn-icons-png.flaticon.com/512/3325/3325916.png'
+            imageUrl: 'https://cdn.discordapp.com/attachments/1352514757097427037/1368494183249346593/AJfQ9KQeAPi-olyEOgS5Uhuv8POCkDvqEmYIKT-0Hksb4AEhNk_A9_vH5boHm3GQbifLxWxh7mucLPlIpcFqMkz2NFYSaf0b9FqT4e4vz6_LI1inT65bFh_6uS7RwwuT7FVEyF-kbfX2hbdcppw_kSxdXjleRiZOmwBaT2RlU0qP2oCopcZTAQ.png?ex=68186d06&is=68171b86&hm=ff0007b2c5c47aae1071d30f04ca0bb3d9472e1aee190d2ead6d2e029d2767e7&'
         },
         quantumPotato: {
             owned: false,
@@ -175,14 +175,14 @@ function updatePotatoImage() {
         potatoImage.src = gameState.upgrades.quantumPotato.imageUrl;
         potatoImage.classList.add('glow');
     } else if (gameState.upgrades.robotPotato.owned) {
-        // Robot potato
+        // Powertato
         potatoImage.src = gameState.upgrades.robotPotato.imageUrl;
         potatoImage.classList.add('spin');
     } else if (gameState.upgrades.spacePotato.owned) {
-        // Space potato
+        // Megatato
         potatoImage.src = gameState.upgrades.spacePotato.imageUrl;
     } else if (gameState.upgrades.rainbowPotato.owned) {
-        // Rainbow potato
+        // Poketato
         potatoImage.src = gameState.upgrades.rainbowPotato.imageUrl;
     } else if (gameState.upgrades.goldenPotato.owned) {
         // Sky potato - apply the sky background
@@ -209,20 +209,19 @@ function showUpgradeEffect(upgradeKey) {
             message.style.color = 'skyblue';
             break;
         case 'rainbowPotato':
-            message.textContent = 'RAINBOW UPGRADE!';
-            message.style.background = 'linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet)';
-            message.style.webkitBackgroundClip = 'text';
-            message.style.webkitTextFillColor = 'transparent';
+            message.textContent = 'POKETATO UPGRADE!';
+            message.style.color = 'red';
+            message.style.textShadow = '0 0 5px yellow, 0 0 10px blue';
             break;
         case 'spacePotato':
-            message.textContent = 'SPACE UPGRADE!';
-            message.style.color = 'blue';
-            message.style.textShadow = '0 0 5px white, 0 0 10px white, 0 0 15px blue';
+            message.textContent = 'MEGATATO UPGRADE!';
+            message.style.color = 'green';
+            message.style.textShadow = '0 0 5px lightgreen, 0 0 10px white';
             break;
         case 'robotPotato':
-            message.textContent = 'ROBOT UPGRADE!';
-            message.style.color = 'silver';
-            message.style.textShadow = '0 0 5px gray, 0 0 10px white';
+            message.textContent = 'POWERTATO UPGRADE!';
+            message.style.color = 'orange';
+            message.style.textShadow = '0 0 5px yellow, 0 0 10px red';
             break;
         case 'quantumPotato':
             message.textContent = 'QUANTUM UPGRADE!';
