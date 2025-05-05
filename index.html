@@ -8,12 +8,90 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <!-- Audio Elements -->
+    <audio id="click-sound" src="assets/click.mp3" preload="auto"></audio>
+    <audio id="upgrade-sound" src="assets/upgrade.mp3" preload="auto"></audio>
+    <audio id="farm-sound" src="assets/farm.mp3" preload="auto"></audio>
+    <audio id="famine-sound" src="assets/famine.mp3" preload="auto"></audio>
+    <audio id="prestige-sound" src="assets/prestige.mp3" preload="auto"></audio>
+    
+    <!-- Town Background Canvas -->
+    <canvas id="town-background"></canvas>
+    
+    <!-- Game Menu Overlay -->
+    <div class="menu-overlay" id="game-menu">
+        <div class="menu-container">
+            <h1>Potato Clicker <span class="version-tag">v2.0</span></h1>
+            
+            <div class="save-slots">
+                <h2>Select Game</h2>
+                <div class="slot" id="slot-1">
+                    <div class="slot-info">
+                        <h3>Save 1</h3>
+                        <p class="potatoes-info">Potatoes: <span id="save1-potatoes">0</span></p>
+                        <p class="prestige-info">Prestige Level: <span id="save1-prestige">0</span></p>
+                    </div>
+                    <div class="slot-buttons">
+                        <button class="play-button" data-slot="1">Play</button>
+                        <button class="reset-button" data-slot="1"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>
+                
+                <div class="slot" id="slot-2">
+                    <div class="slot-info">
+                        <h3>Save 2</h3>
+                        <p class="potatoes-info">Potatoes: <span id="save2-potatoes">0</span></p>
+                        <p class="prestige-info">Prestige Level: <span id="save2-prestige">0</span></p>
+                    </div>
+                    <div class="slot-buttons">
+                        <button class="play-button" data-slot="2">Play</button>
+                        <button class="reset-button" data-slot="2"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>
+                
+                <div class="slot" id="slot-3">
+                    <div class="slot-info">
+                        <h3>Save 3</h3>
+                        <p class="potatoes-info">Potatoes: <span id="save3-potatoes">0</span></p>
+                        <p class="prestige-info">Prestige Level: <span id="save3-prestige">0</span></p>
+                    </div>
+                    <div class="slot-buttons">
+                        <button class="play-button" data-slot="3">Play</button>
+                        <button class="reset-button" data-slot="3"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Prestige Confirmation Modal -->
+    <div class="modal hidden" id="prestige-modal">
+        <div class="modal-content">
+            <h2>Prestige to a New Planet</h2>
+            <p>You'll reset your progress but gain <span id="prestige-points-gain">0</span> prestige points!</p>
+            <p>Each prestige point gives +5% potato production.</p>
+            <div class="modal-buttons">
+                <button id="prestige-confirm">Prestige Now</button>
+                <button id="prestige-cancel">Cancel</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Game Container -->
     <div class="game-container">
         <div class="header">
             <h1>Potato Clicker <span class="version-tag">v2.0</span></h1>
-            <button id="dark-mode-toggle" class="mode-toggle">
-                <i class="fas fa-moon"></i>
-            </button>
+            <div class="header-buttons">
+                <button id="menu-button" class="menu-toggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <button id="sound-toggle" class="mode-toggle">
+                    <i id="sound-toggle-icon" class="fas fa-volume-up"></i>
+                </button>
+                <button id="dark-mode-toggle" class="mode-toggle">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
         </div>
         
         <div id="famine-alert" class="famine-alert hidden">
@@ -35,23 +113,32 @@
                     <i class="fas fa-tractor"></i> <span id="potatoes-per-second">0</span> per second
                 </div>
             </div>
+            <div class="prestige-stats">
+                <div class="prestige-level">
+                    <i class="fas fa-star"></i> Prestige Level: <span id="prestige-level">0</span>
+                </div>
+                <div class="prestige-bonus">
+                    <i class="fas fa-percentage"></i> Bonus: <span id="prestige-bonus">0</span>%
+                </div>
+            </div>
         </div>
         
         <div class="potato-container">
-            <img id="potato" src="https://cdn.discordapp.com/attachments/1352514757097427037/1368492928607064064/image.png?ex=68186bdb&is=68171a5b&hm=958d4e783b5d3b33767d683934714a24f05e5e2608f5cce44229668a98388094&" alt="Potato">
+            <img id="potato" src="assets/potato.png" alt="Potato">
         </div>
         
         <div class="game-sections">
             <div class="section-tabs">
                 <button class="tab-button active" data-tab="upgrades-tab">Upgrades</button>
                 <button class="tab-button" data-tab="farms-tab">Farms</button>
+                <button class="tab-button" data-tab="prestige-tab">Prestige</button>
             </div>
             
             <div class="tab-content active" id="upgrades-tab">
                 <h2>Potato Upgrades</h2>
                 <div class="upgrades">
                     <div class="upgrade" id="goldenPotato">
-                        <img src="https://media.discordapp.net/attachments/1352514757097427037/1368493066289414185/image.png?ex=68186bfc&is=68171a7c&hm=11055cb4dda1b6d24cf1983fe9b7b60b00a0ebfc63e2ca167e0ffa9744b1a8d5" alt="Sky Potato" class="upgrade-img">
+                        <img src="assets/skypotato.png" alt="Sky Potato" class="upgrade-img">
                         <div>
                             <h3>Sky Potato</h3>
                             <p>2x potatoes per click</p>
@@ -148,11 +235,71 @@
                     </div>
                 </div>
             </div>
+            
+            <div class="tab-content" id="prestige-tab">
+                <h2>Prestige System</h2>
+                <div class="prestige-container">
+                    <div class="prestige-info-box">
+                        <h3>Current Planet: <span id="planet-name">Earth</span></h3>
+                        <p>When you prestige, you'll move to a new planet and start over with a production bonus!</p>
+                        <p>Your current prestige level: <span id="current-prestige-level">0</span></p>
+                        <p>Current production bonus: <span id="current-production-bonus">0</span>%</p>
+                    </div>
+                    
+                    <div class="prestige-calculator">
+                        <h3>Prestige Calculator</h3>
+                        <p>Your potato empire is worth <span id="prestige-points-available">0</span> prestige points</p>
+                        <p class="small-text">(Based on lifetime potatoes and upgrades)</p>
+                        <p>After prestige, your production bonus will be <span id="next-production-bonus">0</span>%</p>
+                        
+                        <button id="prestige-button" disabled>Prestige to New Planet</button>
+                    </div>
+                </div>
+            </div>
         </div>
         
         <div class="credits">
             <p>A <span class="credit-highlight">Mirage★Net</span> collaboration</p>
             <p class="version">Version 2.0 | Now with automated potato farms and events!</p>
+            <button id="github-setup" class="github-setup-button">GitHub Setup</button>
+            <button id="debug-toggle" class="github-setup-button">Debug Panel</button>
+        </div>
+    </div>
+    
+    <!-- Debug Panel -->
+    <div id="debug-panel" class="debug-panel hidden">
+        <div class="debug-header">
+            <h3>Debug & Testing Panel</h3>
+            <button id="debug-close" class="debug-close-btn"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="debug-content">
+            <div class="debug-section">
+                <h4>GitHub Integration Status</h4>
+                <div class="status-item">
+                    <span>Integration Enabled:</span>
+                    <span id="debug-github-enabled" class="status-badge">Checking...</span>
+                </div>
+                <div class="status-item">
+                    <span>GitHub Token:</span>
+                    <span id="debug-github-token" class="status-badge">Checking...</span>
+                </div>
+                <div class="status-item">
+                    <span>Last Sync:</span>
+                    <span id="debug-last-sync" class="status-badge">Never</span>
+                </div>
+            </div>
+            
+            <div class="debug-section">
+                <h4>Test Actions</h4>
+                <button id="test-github-connection" class="debug-btn">Test GitHub Connection</button>
+                <button id="force-sync" class="debug-btn">Force Sync Now</button>
+                <button id="clear-local-storage" class="debug-btn">Clear Local Storage</button>
+            </div>
+            
+            <div class="debug-section">
+                <h4>Error Log</h4>
+                <div id="error-log" class="error-log">No errors logged</div>
+            </div>
         </div>
     </div>
     <script src="script.js"></script>
