@@ -198,23 +198,24 @@ const prestigeConfirm = document.getElementById('prestige-confirm');
 const prestigeCancel = document.getElementById('prestige-cancel');
 
 // DOM Elements for audio
-const clickSound = document.getElementById('click-sound');
-const upgradeSound = document.getElementById('upgrade-sound');
-const farmSound = document.getElementById('farm-sound');
-const famineSound = document.getElementById('famine-sound');
-const prestigeSound = document.getElementById('prestige-sound');
+const clickSound = null;
+const upgradeSound = null;
+const farmSound = null;
+const famineSound = null;
+const prestigeSound = null;
 
 // Add audio mute toggle
-let soundEnabled = true;
+let soundEnabled = false; // Set to false by default since we don't have audio files
 
 // Error logging system
 let errorLog = [];
 const MAX_LOG_ENTRIES = 50;
 
 // GitHub Gist integration constants
-const GITHUB_ENABLED = true; // Default to false until user sets up credentials
+const GITHUB_ENABLED = true; // Default to true to use the public shared Gist
 const GITHUB_USERNAME = 'Ellesdy'; // Your GitHub username
 const GIST_ID = 'f3b651bdc0ee0cacc805e5c5a82f1279'; // ID of the Gist used for storage
+const USE_PUBLIC_GIST = true; // Set to true to allow everyone to use the shared Gist
 
 // This function would be used if the token was injected at build time
 function getGitHubToken() {
@@ -228,18 +229,26 @@ function getGitHubToken() {
         return window.GITHUB_TOKEN;
     }
     
-    // Finally fallback to the constant (which should be empty in production)
-    return GITHUB_TOKEN;
+    // Return null if no token is available
+    return null;
 }
 
-// Check if storage is available
+// Check if storage is available with better error handling
 function isStorageAvailable() {
+    // If we already detected storage is unavailable, don't try again
+    if (window._storageUnavailable === true) {
+        return false;
+    }
+    
     try {
         const test = 'test';
         localStorage.setItem(test, test);
         localStorage.removeItem(test);
         return true;
     } catch (e) {
+        console.warn("Local storage is not available:", e.message);
+        // Remember that storage is unavailable to prevent future attempts
+        window._storageUnavailable = true;
         return false;
     }
 }
@@ -251,17 +260,18 @@ async function loadFromGitHub(slotNumber) {
     const gistId = window.GIST_ID || GIST_ID;
     const isEnabled = window.GITHUB_ENABLED !== undefined ? window.GITHUB_ENABLED : GITHUB_ENABLED;
     
-    if (!isEnabled || !token || !gistId) {
-        logError('GitHub loading is not properly configured', null, 'GitHubLoad');
+    if (!isEnabled) {
+        logError('GitHub loading is not enabled', null, 'GitHubLoad');
         return null;
     }
     
     try {
-        const response = await fetch(`https://api.github.com/gists/${gistId}`, {
-            headers: {
-                'Authorization': `token ${token}`
-            }
-        });
+        // Different request options based on whether we have a token or using public gist
+        const requestOptions = token ? 
+            { headers: { 'Authorization': `token ${token}` } } : 
+            {};
+        
+        const response = await fetch(`https://api.github.com/gists/${gistId}`, requestOptions);
         
         if (!response.ok) {
             throw new Error(`Failed to fetch Gist: ${response.status} ${response.statusText}`);
@@ -291,9 +301,22 @@ async function deleteFromGitHub(slotNumber) {
     const token = getGitHubToken();
     const gistId = window.GIST_ID || GIST_ID;
     const isEnabled = window.GITHUB_ENABLED !== undefined ? window.GITHUB_ENABLED : GITHUB_ENABLED;
+    const usePublicGist = window.USE_PUBLIC_GIST !== undefined ? window.USE_PUBLIC_GIST : USE_PUBLIC_GIST;
     
-    if (!isEnabled || !token || !gistId) {
-        logError('GitHub deletion is not properly configured', null, 'GitHubDelete');
+    if (!isEnabled) {
+        logError('GitHub deletion is not enabled', null, 'GitHubDelete');
+        return false;
+    }
+    
+    // If using public gist mode without a token, inform user they need a token to delete
+    if (usePublicGist && !token) {
+        logError('GitHub deletion requires a personal token. Using public Gist for loading only.', null, 'GitHubDelete');
+        alert('To delete saves from GitHub, you need to set up your own GitHub token in the GitHub Setup. Currently using the shared Gist for loading only.');
+        return false;
+    }
+    
+    if (!token || !gistId) {
+        logError('GitHub token or Gist ID missing', null, 'GitHubDelete');
         return false;
     }
     
@@ -394,23 +417,30 @@ async function loadGame(slot) {
         const savedState = localStorage.getItem(`potatoClickerSave${slot}`);
         
         if (savedState) {
-            // Parse saved game state
-            gameState = JSON.parse(savedState);
-            
-            // Apply settings
-            applyGameSettings();
-            
-            // Set current slot
-            currentSlot = slot;
-            
-            // Update display
-            updateDisplay();
-            updatePotatoImage();
-            
-            return true;
+            try {
+                // Parse saved game state
+                gameState = JSON.parse(savedState);
+                
+                // Apply settings
+                applyGameSettings();
+                
+                // Set current slot
+                currentSlot = slot;
+                
+                // Update display
+                updateDisplay();
+                updatePotatoImage();
+                
+                return true;
+            } catch (parseError) {
+                logError('Failed to parse saved game data', parseError, 'LoadGame');
+                alert('Your save data appears to be corrupted. Starting a new game.');
+                return false;
+            }
         }
     } else {
         logError("Local storage not available - can't load saved games", null, 'Storage');
+        // We don't show another alert here since saveGame already shows one
     }
     
     return false;
@@ -477,21 +507,34 @@ function updateLastSyncTime() {
 
 // Function to update debug panel status displays
 function updateDebugPanelStatus() {
-    // GitHub Enabled status
     const isEnabled = window.GITHUB_ENABLED !== undefined ? window.GITHUB_ENABLED : GITHUB_ENABLED;
+    const usePublicGist = window.USE_PUBLIC_GIST !== undefined ? window.USE_PUBLIC_GIST : USE_PUBLIC_GIST;
+    
+    // GitHub Enabled status
     const githubEnabledElement = document.getElementById('debug-github-enabled');
     if (githubEnabledElement) {
-        githubEnabledElement.textContent = isEnabled ? 'Yes' : 'No';
-        githubEnabledElement.className = isEnabled ? 'status-badge success' : 'status-badge warning';
+        if (isEnabled && usePublicGist) {
+            githubEnabledElement.textContent = 'Yes (Public Read-only)';
+            githubEnabledElement.className = 'status-badge warning';
+        } else if (isEnabled) {
+            githubEnabledElement.textContent = 'Yes';
+            githubEnabledElement.className = 'status-badge success';
+        } else {
+            githubEnabledElement.textContent = 'No';
+            githubEnabledElement.className = 'status-badge warning';
+        }
     }
     
     // GitHub Token status
-    const token = window.GITHUB_TOKEN || GITHUB_TOKEN;
+    const token = getGitHubToken();
     const tokenElement = document.getElementById('debug-github-token');
     if (tokenElement) {
         if (token) {
-            tokenElement.textContent = token ? 'Set (Hidden)' : 'Not Set';
-            tokenElement.className = token ? 'status-badge success' : 'status-badge error';
+            tokenElement.textContent = 'Set (Hidden)';
+            tokenElement.className = 'status-badge success';
+        } else if (usePublicGist) {
+            tokenElement.textContent = 'None (Using Public Gist)';
+            tokenElement.className = 'status-badge warning';
         } else {
             tokenElement.textContent = 'Not Set';
             tokenElement.className = 'status-badge error';
@@ -511,18 +554,25 @@ async function testGitHubConnection() {
     const token = getGitHubToken();
     const gistId = window.GIST_ID || GIST_ID;
     const isEnabled = window.GITHUB_ENABLED !== undefined ? window.GITHUB_ENABLED : GITHUB_ENABLED;
+    const usePublicGist = window.USE_PUBLIC_GIST !== undefined ? window.USE_PUBLIC_GIST : USE_PUBLIC_GIST;
     
-    if (!isEnabled || !token || !gistId) {
-        logError('GitHub configuration incomplete', null, 'GitHubTest');
-        return { success: false, message: 'GitHub configuration incomplete' };
+    if (!isEnabled) {
+        logError('GitHub integration is not enabled', null, 'GitHubTest');
+        return { success: false, message: 'GitHub integration is not enabled' };
+    }
+    
+    if (!gistId) {
+        logError('Gist ID is missing', null, 'GitHubTest');
+        return { success: false, message: 'Gist ID is missing' };
     }
     
     try {
-        const response = await fetch(`https://api.github.com/gists/${gistId}`, {
-            headers: {
-                'Authorization': `token ${token}`
-            }
-        });
+        // Different request options based on whether we have a token
+        const requestOptions = token ? 
+            { headers: { 'Authorization': `token ${token}` } } : 
+            {};
+        
+        const response = await fetch(`https://api.github.com/gists/${gistId}`, requestOptions);
         
         if (!response.ok) {
             const error = await response.text();
@@ -536,6 +586,18 @@ async function testGitHubConnection() {
         
         const data = await response.json();
         updateLastSyncTime();
+        
+        // If using public gist without a token, inform the user
+        if (usePublicGist && !token) {
+            console.log('Connected to public Gist (read-only mode)');
+            return { 
+                success: true, 
+                message: 'Connected to public Gist (read-only mode). To save your progress to GitHub, you need to set up your own token.',
+                data,
+                readOnly: true 
+            };
+        }
+        
         console.log('GitHub connection successful:', data);
         return { success: true, message: 'Connection successful', data };
     } catch (error) {
@@ -548,6 +610,17 @@ async function testGitHubConnection() {
 async function forceSyncToGitHub() {
     // Use current slot or default to 1
     const slot = currentSlot || 1;
+    const usePublicGist = window.USE_PUBLIC_GIST !== undefined ? window.USE_PUBLIC_GIST : USE_PUBLIC_GIST;
+    const token = getGitHubToken();
+    
+    // If using public gist without a token, show message
+    if (usePublicGist && !token) {
+        logError('GitHub saving requires a personal token. Using public Gist for loading only.', null, 'GitHubSync');
+        return { 
+            success: false, 
+            message: 'Cannot sync to GitHub without a personal token. Please set up your GitHub credentials in GitHub Setup.' 
+        };
+    }
     
     try {
         const result = await saveToGitHub(slot, gameState);
@@ -590,12 +663,15 @@ function clearLocalStorage() {
     }
 }
 
-// Enhanced save with error logging
+// Enhanced save with error logging and storage availability check
 async function saveGame() {
     try {
         // Try GitHub first if enabled
         const isEnabled = window.GITHUB_ENABLED !== undefined ? window.GITHUB_ENABLED : GITHUB_ENABLED;
-        if (isEnabled) {
+        const usePublicGist = window.USE_PUBLIC_GIST !== undefined ? window.USE_PUBLIC_GIST : USE_PUBLIC_GIST;
+        const token = getGitHubToken();
+        
+        if (isEnabled && (!usePublicGist || token)) {
             try {
                 const savedToGitHub = await saveToGitHub(currentSlot, gameState);
                 if (savedToGitHub) {
@@ -614,7 +690,23 @@ async function saveGame() {
             localStorage.setItem(`potatoClickerSave${currentSlot}`, JSON.stringify(gameState));
             await updateSaveSlots();
         } else {
-            logError("Local storage not available - game progress won't be saved", null, 'Storage');
+            if (isEnabled && usePublicGist && !token) {
+                logError("Local storage not available - public Gist is read-only. Consider setting up GitHub credentials.", null, 'Storage');
+                
+                // Show a user-friendly message about the situation
+                if (!window._publicGistNoteShown) {
+                    alert("Your browser is blocking local storage. You can view shared saves from the public Gist, but to save your own progress, set up your GitHub credentials in the GitHub Setup.");
+                    window._publicGistNoteShown = true;
+                }
+            } else {
+                logError("Local storage not available - game progress won't be saved", null, 'Storage');
+                
+                // Show a user-friendly message about the storage issue
+                if (!window._storageWarningShown) {
+                    alert("Your browser is blocking storage access. Your progress won't be saved. Try using a local server (start-server.bat) or GitHub Pages instead of opening the file directly.");
+                    window._storageWarningShown = true;
+                }
+            }
         }
     } catch (error) {
         logError('Save game error', error, 'SaveGame');
@@ -627,9 +719,22 @@ async function saveToGitHub(slotNumber, gameData) {
     const token = getGitHubToken();
     const gistId = window.GIST_ID || GIST_ID;
     const isEnabled = window.GITHUB_ENABLED !== undefined ? window.GITHUB_ENABLED : GITHUB_ENABLED;
+    const usePublicGist = window.USE_PUBLIC_GIST !== undefined ? window.USE_PUBLIC_GIST : USE_PUBLIC_GIST;
     
-    if (!isEnabled || !token || !gistId) {
-        logError('GitHub saving is not properly configured', null, 'GitHubSave');
+    if (!isEnabled) {
+        logError('GitHub saving is not enabled', null, 'GitHubSave');
+        return false;
+    }
+    
+    // If using public gist mode without a token, inform user they need a token to save
+    if (usePublicGist && !token) {
+        logError('GitHub saving requires a personal token. Using public Gist for loading only.', null, 'GitHubSave');
+        alert('To save to GitHub, you need to set up your own GitHub token in the GitHub Setup. Currently using the shared Gist for loading only.');
+        return false;
+    }
+    
+    if (!token || !gistId) {
+        logError('GitHub token or Gist ID missing', null, 'GitHubSave');
         return false;
     }
     
@@ -792,14 +897,23 @@ function updateFamineUI() {
     }
 }
 
-// Function to play a sound
+// Function to play a sound - modified to safely handle missing audio files
 function playSound(sound) {
-    if (soundEnabled) {
+    // Early return if sound is disabled or audio element doesn't exist
+    if (!soundEnabled || !sound) return;
+    
+    try {
         // Reset the audio to start
         sound.currentTime = 0;
         sound.play().catch(error => {
             console.log("Audio play failed:", error);
+            // If audio fails, disable sound to prevent future errors
+            soundEnabled = false;
         });
+    } catch (error) {
+        console.log("Audio play error:", error);
+        // If any error occurs, disable sound to prevent future errors
+        soundEnabled = false;
     }
 }
 
@@ -1419,9 +1533,15 @@ function setupEventListeners() {
     // Test GitHub connection button
     document.getElementById('test-github-connection')?.addEventListener('click', async () => {
         const result = await testGitHubConnection();
-        alert(result.success ? 
-            'GitHub connection successful!' : 
-            `GitHub connection failed: ${result.message}`);
+        if (result.success) {
+            if (result.readOnly) {
+                alert('Connected to public Gist in read-only mode. You can see shared saves, but to save your own progress, you need to set up your GitHub credentials.');
+            } else {
+                alert('GitHub connection successful!');
+            }
+        } else {
+            alert(`GitHub connection failed: ${result.message}`);
+        }
     });
     
     // Force sync button
@@ -1962,10 +2082,16 @@ function drawClouds() {
     });
 }
 
-// Add sound toggle function
+// Add sound toggle function - modified to warn user about missing audio
 function toggleSound() {
     gameState.soundEnabled = !gameState.soundEnabled;
     soundEnabled = gameState.soundEnabled;
+    
+    // If trying to enable sound, show warning about missing files
+    if (soundEnabled) {
+        console.warn("Audio files are missing, sound functionality is limited");
+        alert("Audio files are missing. Sound has been enabled but may not work.");
+    }
     
     // Update the sound toggle button icon
     const soundToggleIcon = document.getElementById('sound-toggle-icon');
@@ -2008,11 +2134,17 @@ function loadGitHubCredentials() {
             window.GITHUB_USERNAME = username || '';
             window.GIST_ID = gistId;
             window.GITHUB_ENABLED = true;
+            window.USE_PUBLIC_GIST = false; // Using personal credentials, not public Gist
             
             console.log('GitHub credentials loaded from local storage');
             return true;
         }
     }
+    
+    // If no credentials found, we'll use the public Gist mode
+    window.GITHUB_ENABLED = true;
+    window.USE_PUBLIC_GIST = true;
+    console.log('No GitHub credentials found, using public Gist in read-only mode');
     
     return false;
 }
@@ -2033,7 +2165,11 @@ function createGitHubSetupModal() {
         modal.innerHTML = `
             <div class="modal-content">
                 <h2>GitHub Integration Setup</h2>
-                <p>Enter your GitHub credentials to enable saving to GitHub Gist.</p>
+                <p>Currently using shared public Gist for loading saves. You can:</p>
+                <ul>
+                    <li>Continue using the shared Gist (read-only)</li>
+                    <li>Set up your own GitHub credentials below to enable saving and deleting</li>
+                </ul>
                 <div class="github-setup-form">
                     <div class="form-group">
                         <label for="github-token">GitHub Token:</label>
@@ -2050,6 +2186,7 @@ function createGitHubSetupModal() {
                 </div>
                 <div class="form-help">
                     <p><small>These credentials are stored in your browser only and never sent to our servers.</small></p>
+                    <p><small>If you don't provide your own GitHub details, you'll still be able to load saves from the shared Gist, but not save or delete.</small></p>
                 </div>
                 <div class="modal-buttons">
                     <button id="github-setup-save">Save Credentials</button>
@@ -2105,19 +2242,28 @@ async function updateSaveSlots() {
         try {
             const token = getGitHubToken();
             const gistId = window.GIST_ID || GIST_ID;
+            const usePublicGist = window.USE_PUBLIC_GIST !== undefined ? window.USE_PUBLIC_GIST : USE_PUBLIC_GIST;
             
-            if (!token || !gistId) {
-                // Skip GitHub check if credentials are missing
+            // Skip token check if we're using the public gist mode
+            if (!usePublicGist && !token) {
+                // Skip GitHub check if credentials are missing and not using public mode
                 console.log('Skipping GitHub save check - credentials missing');
                 updateSaveUI(saves);
                 return;
             }
             
-            const response = await fetch(`https://api.github.com/gists/${gistId}`, {
-                headers: {
-                    'Authorization': `token ${token}`
-                }
-            });
+            if (!gistId) {
+                console.log('Skipping GitHub save check - Gist ID missing');
+                updateSaveUI(saves);
+                return;
+            }
+            
+            // Different request options based on whether we have a token
+            const requestOptions = token ? 
+                { headers: { 'Authorization': `token ${token}` } } : 
+                {};
+            
+            const response = await fetch(`https://api.github.com/gists/${gistId}`, requestOptions);
             
             if (response.ok) {
                 const gistData = await response.json();
@@ -2177,4 +2323,39 @@ function initializeTabs() {
             document.getElementById(tabId).classList.add('active');
         });
     });
-} 
+}
+
+// Function to delete a save both from GitHub and localStorage
+async function deleteSave(slot) {
+    const isEnabled = window.GITHUB_ENABLED !== undefined ? window.GITHUB_ENABLED : GITHUB_ENABLED;
+    const usePublicGist = window.USE_PUBLIC_GIST !== undefined ? window.USE_PUBLIC_GIST : USE_PUBLIC_GIST;
+    const token = getGitHubToken();
+    
+    // Try GitHub first if enabled and not using public Gist without token
+    if (isEnabled && (!usePublicGist || token)) {
+        try {
+            const deletedFromGitHub = await deleteFromGitHub(slot);
+            if (deletedFromGitHub) {
+                console.log(`Save deleted from GitHub Gist (Slot ${slot})`);
+            }
+        } catch (error) {
+            logError('GitHub delete failed', error, 'GitHubDelete');
+            // Continue to localStorage regardless
+        }
+    }
+    
+    // Delete from localStorage too
+    if (isStorageAvailable()) {
+        localStorage.removeItem(`potatoClickerSave${slot}`);
+        console.log(`Save deleted from localStorage (Slot ${slot})`);
+    }
+    
+    // Reset game state if we're deleting the current slot
+    if (slot === currentSlot) {
+        startNewGame(slot);
+    }
+    
+    // Update save slots display
+    await updateSaveSlots();
+}
+  
